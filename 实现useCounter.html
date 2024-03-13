@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        // const [current,{inc,dec,set,reset}] = useCounter(initValue,{min,max})
+        const useCounter = (initV = 0, { min = -Infinity, max = -Infinity } = {}) => {
+            const [current, setCurrent] = useState(() => {
+                return getTargetValue(initV, { min, max })
+            })
+
+            const set = (value) => {
+                setCurrent(() => {
+                    return getTargetValue(value, { min, max })
+                })
+            }
+
+            const inc = (value = 1) => {
+                setCurrent(c => {
+                    return getTargetValue(cur + value, { min, max })
+                })
+            }
+
+            const dec = (value = 1) => {
+                setCurrent(c => {
+                    return getTargetValue(cur - value, { min, max })
+                })
+            }
+
+            const reset = () => {
+                setCurrent(initV)
+            }
+            return [
+                cur,
+                {
+                    inc,
+                    dec,
+                    set,
+                    reset,
+                }
+            ]
+        }
+    </script>
+</body>
+
+</html>
