@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      function _new(ctor, ...args) {
+        if(typeof ctor !== "function") {
+          throw "newOperator function the first param must be a function";
+        }
+        let obj = {};
+        obj.__proto__ = ctor.prototype;
+        const res = ctor.apply(obj, args);
+        const isObject = typeof res === "object" && res !== null;
+        const isFn = typeof res === "function";
+        return isObject || isFn ? res : obj;
+      }
+    </script>
+  </body>
+</html>
