@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      // map 记录出现过的对象，解决循环引用
+      const deepClone = (target, map = new WeakMap()) => {
+        // 1. 对拷贝类型进行判断
+        if (typeof target !== "object" || target === null) {
+          return target;
+        }
+        // 2. 针对特殊类型进行处理
+        const constructor = target.constructor;
+        if (/^(Function|RegExp|Date|Map|Set)$/i.test(constructor.name)) {
+          return new constructor(target);
+        }
+        // 3. 处理循环引用 共同引用
+        if (map.get(target)) return map.get(target);
+
+        // 4. 创建新对象
+        const cloneTarget = Array.isArray(target) ? [] : {};
+        map.set(target, cloneTarget);
+
+        // 5. 循环 + 递归
+        Object.keys(target).forEach((key) => {
+          cloneTarget[key] = deepClone(target[key], map);
+        });
+
+        return cloneTarget;
+      };
+    </script>
+  </body>
+</html>
