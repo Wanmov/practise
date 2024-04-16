@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      // 方式一
+      /**
+       * 缺点：
+       * 1.使用了 splice 会进行拷贝操作，最坏情况下复杂度为 O(n)
+       * 2.每次使用两个数组会产生空间复杂度
+       * 3.concat 会对数组进行一次拷贝，也是O(n)
+       * 对大数据来说慢
+       */
+      const quickSort = (arr) => {
+        if (arr.length <= 1) return arr;
+        let pivotIndex = Math.floor(arr.length / 2);
+        let pivot = arr.splice(pivotIndex, 1)[0];
+        let left = [];
+        let right = [];
+        for (let i = 0; i < arr.length; i++) {
+          if (arr[i] < pivot) {
+            left.push(arr[i]);
+          } else {
+            right.push(arr[i]);
+          }
+        }
+        return quickSort(left).concat([pivot], quickSort(right));
+      };
+
+      // 方法二
+      function swap(Arr, i, j) {
+        let t = Arr[i];
+        Arr[i] = Arr[j];
+        Arr[j] = t;
+      }
+
+      /**
+       *
+       * @param {Array} Arr 数组
+       * @param {Number} p  起始下标
+       * @param {Number} r  数组长度
+       */
+      function divide(Arr, p, length) {
+        const pivot = Arr[length - 1];
+        let i = p - 1;
+        for (let j = p; j < length - 1; j++) {
+          if (Arr[j] <= pivot) {
+            i++;
+            swap(Arr, i, j);
+          }
+        }
+        swap(Arr, i + 1, length - 1);
+        return i + 1;
+      }
+
+      function qsort(Arr, p, length) {
+        length = length || Arr.length;
+        if (p < length - 1) {
+          const q = divide(Arr, p, length);
+          qsort(Arr, p, q);
+          qsort(Arr, q + 1, length);
+        }
+        return Arr;
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const PENDING = "pending";
+      const FULFILLED = "fulfilled";
+      const REJECTED = "rejected";
+
+      /**
+       * 执行微任务
+       * @param {Function} callback
+       */
+      function runMicroTask(callback) {
+        if (process && process.nextTick) {
+          process.nextTick(callback);
+        } else if (MutationObserver) {
+          const p = document.createElement("p");
+          const observer = new MutationObserver(callback);
+          observer.observe(p, { attributes: true });
+          p.setAttribute("id", "id");
+        } else {
+          setTimeout(callback, 0);
+        }
+      }
+
+      class MyPromise {
+        /**
+         *
+         * @param {Function} executor 任务执行器，立即执行
+         */
+        constructor(executor) {
+          this._state = PENDING;
+          this._value = undefined;
+          this._handlers = []; // 处理函数形成的队列
+          try {
+            executor(this._resolve.bind(this), this._reject.bind(this));
+          } catch (error) {
+            this._reject(error);
+          }
+        }
+
+        /**
+         * 任务状态改变时的回调函数
+         * @param {String} newState
+         * @param {any} value
+         */
+        _changeState(newState, value) {
+          if (this._state !== PENDING) return;
+          this._state = newState;
+          this._value = value;
+        }
+
+        /**
+         * 添加处理函数
+         * @param {Function} executor //要添加的函数
+         * @param {String} state //该函数什么状态下执行
+         * @param {Function} resolve //then函数返回的Promise成功
+         * @param {Function} reject //then函数返回的Promise失败
+         */
+        _pushHandlers(executor, state, resolve, reject) {
+          this._handlers.push({ executor, state, resolve, reject });
+        }
+
+        /**
+         * 标记当前任务完成
+         * @param {any} value
+         */
+        _resolve(value) {
+          this._changeState(FULFILLED, value);
+        }
+        /**
+         * 标记当前任务失败
+         * @param {any} reason
+         */
+        _reject(reason) {
+          this._changeState(REJECTED, reason);
+        }
+
+        then(onFulfilled, onRejected) {
+          return new MyPromise((resolve, reject) => {
+            this._pushHandlers(onFulfilled, FULFILLED, resolve, reject);
+            this._pushHandlers(onRejected, REJECTED, resolve, reject);
+          });
+        }
+      }
+    </script>
+  </body>
+</html>
