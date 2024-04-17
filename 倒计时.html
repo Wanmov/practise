@@ -22,17 +22,17 @@
           second: second % 60,
         };
       }
-      const spanArr = document.querySelectorAll(".cutdown span");
       function render(data) {
-        const d = document.querySelectorAll(".cutdown");
-        d.innerHTML = `
-      <span class=${data.day === 0 ? "hide" : ""}>${("0" + data.day).slice(
-          -2
-        )}天</span>
-      <span>${("0" + data.hour).slice(-2)}:</span>
-      <span>${("0" + data.min).slice(-2)}:</span>
-      <span>${("0" + data.second).slice(-2)}:</span>
-      `;
+        let nodeList = document.getElementsByTagName("span");
+        if (data.day > 0) {
+          nodeList[0].innerText =
+            (data.day < 9 ? "0" + data.day : data.day) + "天";
+        } else {
+          nodeList[0].classList.add("hide");
+        }
+        nodeList[1].innerText = ("0" + data.hour).slice(-2) + ":";
+        nodeList[2].innerText = ("0" + data.min).slice(-2) + ":";
+        nodeList[3].innerText = ("0" + data.second).slice(-2);
       }
     </script>
   </body>

@@ -28,6 +28,14 @@
         }
       }
 
+      function isPromise(obj) {
+        return !!(
+          obj &&
+          typeof obj === "object" &&
+          typeof obj.then === "function"
+        );
+      }
+
       class MyPromise {
         /**
          *
@@ -53,6 +61,8 @@
           if (this._state !== PENDING) return;
           this._state = newState;
           this._value = value;
+          // 状态变化执行队列
+          this._runHandlers();
         }
 
         /**
@@ -64,6 +74,40 @@
          */
         _pushHandlers(executor, state, resolve, reject) {
           this._handlers.push({ executor, state, resolve, reject });
+        }
+
+        // 根据实际情况，执行队列
+        _runHandlers() {
+          if (this._state === PENDING) return;
+          while (this._handlers[0]) {
+            const handler = this._handlers[0];
+            this._runOneHandler(handler);
+            // 执行完一个移除一个
+            this._handlers.shift();
+          }
+        }
+
+        _runOneHandler({ executor, state, resolve, reject }) {
+          runMicroTask(() => {
+            if (state !== this._state) return;
+            if (typeof handler.executor !== "function") {
+              this._state === FULFILLED
+                ? resolve(this._value)
+                : reject(this._value);
+              return;
+            }
+            try {
+              // 结构调用 避免改变 this 指向
+              const res = executor(this._value);
+              if (isPromise(res)) {
+                res.then(resolve, reject);
+              } else {
+                resolve(res);
+              }
+            } catch (error) {
+              reject(error);
+            }
+          });
         }
 
         /**
@@ -85,6 +129,7 @@
           return new MyPromise((resolve, reject) => {
             this._pushHandlers(onFulfilled, FULFILLED, resolve, reject);
             this._pushHandlers(onRejected, REJECTED, resolve, reject);
+            this._runHandlers();
           });
         }
       }
