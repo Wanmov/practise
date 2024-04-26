@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      // 1. 转为二进制，获取第 bit 位
+      function valueAtBit(num, bit) {
+        let binary = num.toString(2).split("");
+        return binary[binary.length - bit];
+      }
+
+      function valueAtBit(num, bit) {
+        return (num >> (bit - 1)) & 1;
+      }
+    </script>
+  </body>
+</html>
